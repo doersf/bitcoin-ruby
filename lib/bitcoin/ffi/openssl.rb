@@ -7,15 +7,9 @@ module Bitcoin
   # ported from: https://github.com/sipa/bitcoin/blob/2d40fe4da9ea82af4b652b691a4185431d6e47a8/key.h
   module OpenSSL_EC # rubocop:disable Naming/ClassAndModuleCamelCase
     extend FFI::Library
-    if FFI::Platform.windows?
-      ffi_lib 'libeay32', 'ssleay32'
-    else
-      ffi_lib [
-        'libssl.so.1.1.0', 'libssl.so.1.1',
-        'libssl.so.1.0.0', 'libssl.so.10',
-        'ssl'
-      ]
-    end
+
+    # prefer the ssl library loaded by the `require "openssl"` in lib.rb if possible.
+    ffi_lib [FFI::CURRENT_PROCESS, "ssl", "libssl.so.1.1", "libssl.so.1", "libssl.so.1.0.0", "libssl.so.1.0", "libeay32", "ssleay32"]
 
     NID_secp256k1 = 714 # rubocop:disable Naming/ConstantName
     POINT_CONVERSION_COMPRESSED = 2
